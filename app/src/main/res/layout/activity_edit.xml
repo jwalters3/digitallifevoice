@@ -30,10 +30,12 @@
                 android:inputType="text" android:maxLines="1"
                 android:singleLine="true" />
 
-            <EditText android:id="@+id/action_device" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:hint="@string/prompt_device"
-                android:imeActionId="@+id/login"
-                android:maxLines="1" android:singleLine="true" />
+
+            <Button android:id="@+id/action_device_button" style="?android:textAppearanceSmall"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="@string/prompt_device"
+                android:textStyle="bold" />
+
 
             <EditText android:id="@+id/action_operation" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:hint="@string/prompt_operation"

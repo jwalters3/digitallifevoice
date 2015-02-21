@@ -33,10 +33,13 @@ public class MainActivity extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ADD_DEVICE) {
             if (resultCode == Activity.RESULT_OK) {
+                long actionId = data.getLongExtra("id", 0);
+                if (actionId != 0) {
+                    DatabaseHandler db = new DatabaseHandler(this);
+                    ActionsListFragment fragment = (ActionsListFragment)this.getFragmentManager().findFragmentById(R.id.fragment);
+                    fragment.addItem(db.getAction(actionId));
+                }
 
-
-                ActionsListFragment fragment = (ActionsListFragment)this.getFragmentManager().findFragmentById(R.id.fragment);
-                fragment.addItem(a);
             }
 
         }

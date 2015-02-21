@@ -13,8 +13,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 
+import com.gc.materialdesign.views.ButtonFloat;
+import com.hackathon.digitallifevoice.EditActivity;
 import com.hackathon.digitallifevoice.R;
 import com.hackathon.digitallifevoice.adapters.ActionsAdapter;
 import com.hackathon.digitallifevoice.data.Action;
@@ -61,7 +64,10 @@ public class ActionsListFragment extends ListFragment  {
                 .setCancelable(false);
         deleteContact.show();
     }
-
+    void showEdit() {
+        Intent myIntent = new Intent(getActivity(), EditActivity.class);
+        getActivity().startActivityForResult(myIntent, this.ADD_DEVICE);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,6 +79,13 @@ public class ActionsListFragment extends ListFragment  {
 
         setListAdapter(adapter);
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_actions_list, null);
+        ButtonFloat addButton = (ButtonFloat) root.findViewById(R.id.buttonFloat);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showEdit();
+            }
+        });
         return root;
     }
 

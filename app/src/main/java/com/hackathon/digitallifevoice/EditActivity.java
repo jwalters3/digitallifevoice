@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -38,6 +39,8 @@ import java.util.List;
  */
 public class EditActivity extends Activity {
 
+    int DEVICE_LIST = 3;
+
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -62,10 +65,17 @@ public class EditActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
-        mNameView = (EditText) findViewById((R.id.action_name));
-        mDeviceView = (EditText) findViewById((R.id.action_device));
-        mVoiceActionView = (EditText) findViewById((R.id.action_device));
-        mOperationView = (EditText) findViewById((R.id.action_operation));
+        mNameView = (EditText) findViewById(R.id.action_name);
+        mVoiceActionView = (EditText) findViewById(R.id.action_voice_command);
+        mOperationView = (EditText) findViewById(R.id.action_operation);
+
+        Button deviceButton = (Button) findViewById(R.id.action_device_button);
+        deviceButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDevicePickerActivity();
+            }
+        });
 
         Button addButton = (Button) findViewById(R.id.action_add_button);
         addButton.setOnClickListener(new OnClickListener() {
@@ -77,6 +87,16 @@ public class EditActivity extends Activity {
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == DEVICE_LIST) {
+            if (resultCode == Activity.RESULT_OK) {
+                // data.
+            }
+
+        }
+    }
 
     public void saveAction() {
         Action a = new Action();
@@ -88,10 +108,16 @@ public class EditActivity extends Activity {
         DatabaseHandler db = new DatabaseHandler(this);
         db.addAction(a);
 
-        setResult(Activity.RESULT_OK);
+        Intent mResult = new Intent();
+        mResult.putExtra("id", a.getId());
+        setResult(Activity.RESULT_OK, mResult);
         finish();
     }
 
+    void showDevicePickerActivity(){
+        Intent myIntent = new Intent(this, DeviceListActivity.class);
+        startActivityForResult(myIntent, this.DEVICE_LIST);
+    }
 //    /**
 //     * Attempts to sign in or register the account specified by the login form.
 //     * If there are form errors (invalid email, missing fields, etc.), the
