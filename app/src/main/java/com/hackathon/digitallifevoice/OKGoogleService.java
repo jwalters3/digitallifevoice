@@ -52,7 +52,7 @@ public class OKGoogleService extends AccessibilityService {
         Toast toast = Toast.makeText(this, toastText, Toast.LENGTH_LONG);
         toast.show();
 
-        Intent myIntent = new Intent(this, MainActivity.class);
+        Intent myIntent = new Intent(this, SearchActionActivity.class);
 
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(myIntent);
