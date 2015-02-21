@@ -1,5 +1,7 @@
 package com.hackathon.digitallifevoice;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -11,6 +13,7 @@ import com.hackathon.digitallifevoice.api.DigitalLifeController;
 import com.hackathon.digitallifevoice.api.DigitalLifeDevice;
 import com.hackathon.digitallifevoice.data.Action;
 import com.hackathon.digitallifevoice.data.DatabaseHandler;
+import com.hackathon.digitallifevoice.fragments.ActionsListFragment;
 
 import java.util.List;
 
@@ -27,6 +30,29 @@ public class MainActivity extends ActionBarActivity {
     public String getAppId() { return PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("appid", "OE_69B642D383971614_1"); }
     public String getUserId() { return PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("username", "553474450");    }
     public String getPassword() { return PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("password", "NO-PASSWD");    }
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_DEVICE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Action a = new Action();
+                a.setOperation("on");
+                a.setVoiceCommand("Turn on Front light");
+                a.setLabel("switch");
+                a.setDeviceType("light");
+                a.setDeviceGuid("sdfsd2fsdfd");
+                DatabaseHandler db = new DatabaseHandler(this);
+                db.addAction(a);
+
+                ActionsListFragment fragment = (ActionsListFragment)this.getFragmentManager().findFragmentById(R.id.fragment);
+                fragment.notifyDataSetChanged();
+            }
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

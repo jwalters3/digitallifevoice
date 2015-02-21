@@ -33,24 +33,11 @@ public class ActionsListFragment extends ListFragment  {
         deleteItemPrompt(action);
     }
 
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_DEVICE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Action a = new Action();
-                a.setOperation("on");
-                a.setVoiceCommand("Turn on Front light");
-                a.setLabel("switch");
-                a.setDeviceType("light");
-                a.setDeviceGuid("sdfsd2fsdfd");
-                DatabaseHandler db = new DatabaseHandler(this.getActivity());
-                adapter.notifyDataSetChanged();
-            }
-
-        }
+    public void notifyDataSetChanged() {
+        adapter.notifyDataSetChanged();
     }
+
+
     private void deleteItemPrompt(final Action action)
     {
 
