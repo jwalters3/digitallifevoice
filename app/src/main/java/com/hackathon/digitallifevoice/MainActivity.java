@@ -1,5 +1,6 @@
 package com.hackathon.digitallifevoice;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * A list view that shows the current list of paired actions
  */
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends BaseActivity {
 
 
     int ADD_DEVICE =1;
@@ -49,10 +50,9 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-
         setContentView(R.layout.activity_main);
+
+
     }
 
 
@@ -81,11 +81,6 @@ public class MainActivity extends ActionBarActivity {
         if (id == R.id.action_devices) {
             Intent myIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(myIntent, this.DEVICE_LIST);
-            return true;
-        }
-        if (id == R.id.action_add) {
-            Intent myIntent = new Intent(this, EditActivity.class);
-            startActivityForResult(myIntent, this.ADD_DEVICE);
             return true;
         }
 

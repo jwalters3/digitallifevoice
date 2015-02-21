@@ -76,6 +76,14 @@ public class DigitalLifeController {
 
     private final JSONParser jsonParser = new JSONParser();
 
+    public String getGatewayGUID() {
+        return gatewayGUID;
+    }
+
+    public void setGatewayGUID(String gatewayGUID) {
+        this.gatewayGUID = gatewayGUID;
+    }
+
     public String getAuthToken() {
         return authToken;
     }
@@ -404,6 +412,15 @@ public class DigitalLifeController {
     public List<DigitalLifeDevice> fetchDevices() {
         List<DigitalLifeDevice> devices = getDevicesAsJSON(deviceJsonData);
         return devices;
+    }
+    public DigitalLifeDevice getDeviceByGuid(String deviceGuid) {
+        List<DigitalLifeDevice> devices = getDevicesAsJSON(deviceJsonData);
+        for (DigitalLifeDevice d : devices) {
+            if (d.getDeviceID().equals(deviceGuid)) {
+                return d;
+            }
+        }
+        return null;
     }
 
 }

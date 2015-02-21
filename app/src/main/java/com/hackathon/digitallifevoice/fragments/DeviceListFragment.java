@@ -45,14 +45,17 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
     public String getAppId() { return PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()).getString("appid", "OE_69B642D383971614_1"); }
     public String getUserId() { return PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()).getString("username", "553474450");    }
     public String getPassword() { return PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()).getString("password", "NO-PASSWD");    }
-    public String getRequestToken() { return PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()).getString("requesttoken", "");    }
-    public String getAuthToken() { return PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()).getString("authtoken", "");    }
 
-    public void saveTokens(String authToken, String requestToken) {
+    public String getAuthToken() { return PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()).getString("authtoken", "");    }
+    public String getRequestToken() { return PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()).getString("requesttoken", "");    }
+    public String getGatewayGuid() { return PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()).getString("gatewayguid", "");    }
+
+    public void saveTokens(String authToken, String requestToken, String gatewayGuid) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this.getActivity()).edit();
                 //.getPreferences().edit();
         editor.putString("authtoken", authToken);
         editor.putString("requesttoken", requestToken);
+        editor.putString("gatewayguid", gatewayGuid);
         editor.apply();
     }
     Context mContext;
@@ -76,9 +79,11 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
                 }
             }
 
-            Toast.makeText(this.getActivity(), device.getName() + " getting set to:  " + pendingValue, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this.getActivity(), device.getName() + " getting set to:  " + pendingValue, Toast.LENGTH_SHORT).show();
             try {
                 dlc.updateDevice(device.getDeviceID(), device.getAction(), pendingValue);
+                device.setStatus(pendingValue);
+                adapter.notifyDataSetChanged();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -93,7 +98,7 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
     public void onLogin(JSONObject data) {
         Toast toast = Toast.makeText(getActivity(), "Logged in", Toast.LENGTH_LONG);
         toast.show();
-        this.saveTokens(dlc.getAuthToken(), dlc.getRequestToken());
+        this.saveTokens(dlc.getAuthToken(), dlc.getRequestToken(),dlc.getGatewayGUID());
         getDevices();
     }
 
@@ -101,7 +106,7 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
         Toast toast = Toast.makeText(getActivity(), "Failed to refresh devices:"+ message, Toast.LENGTH_LONG);
         toast.show();
         // clear out tokens
-        this.saveTokens("","");
+        this.saveTokens("","","");
     }
     public void onDeviceRefresh(JSONObject data) {
         if (adapter != null) {
@@ -114,12 +119,16 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
     }
 
     private void getDevices() {
+        dlc.setGatewayGUID(this.getGatewayGuid());
+        dlc.setAuthToken(this.getAuthToken());
+        dlc.setRequestToken(this.getRequestToken());
         dlc.getDevices(this);
     }
     private void loginDigitalLife() {
         dlc = DigitalLifeController.getInstance();
         dlc.init(getAppId(), "https://systest.digitallife.att.com");
-        if ((this.getRequestToken().isEmpty()) || (this.getAuthToken().isEmpty())) {
+
+        if ((this.getRequestToken().isEmpty()) || (this.getAuthToken().isEmpty()) || (this.getGatewayGuid().isEmpty()) ) {
             try {
                 dlc.login(getUserId(), getPassword(), this);
             } catch (Exception e) {

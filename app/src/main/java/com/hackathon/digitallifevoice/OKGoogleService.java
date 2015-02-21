@@ -8,6 +8,13 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.hackathon.digitallifevoice.api.DigitalLifeController;
+import com.hackathon.digitallifevoice.api.DigitalLifeDevice;
+import com.hackathon.digitallifevoice.data.Action;
+import com.hackathon.digitallifevoice.data.DatabaseHandler;
+
+import java.util.List;
+
 /**
  * Created by SWBRADSH on 2/20/2015.
  */
@@ -17,6 +24,7 @@ public class OKGoogleService extends AccessibilityService {
 
     private String sSearchString = null;
     private boolean bFoundSearch = false;
+    private DigitalLifeController dlc;
 
     private String getEventType(AccessibilityEvent event) {
         switch (event.getEventType()) {
@@ -46,16 +54,36 @@ public class OKGoogleService extends AccessibilityService {
         return sb.toString();
     }
 
+    private Action getActionForVoiceText(String voiceText) {
+        DatabaseHandler db = new DatabaseHandler(this);
+        List<Action> actions = db.getAllActions();
+        Action matchedAction = null;
+        for (Action a : actions) {
+            if (a.getVoiceCommand().toLowerCase().equals(voiceText.toLowerCase())){
+                return a;
+            }
+        }
+        return null;
+    }
+
     private void processSearch(String searchText) {
 
-        String toastText = "Process this search text: " + searchText;
-        Toast toast = Toast.makeText(this, toastText, Toast.LENGTH_LONG);
-        toast.show();
+        Action targetAction = getActionForVoiceText(searchText);
+        if (targetAction != null) {
+            String toastText = "AT&T Digital Life Action received";
+            Toast toast = Toast.makeText(this, toastText, Toast.LENGTH_LONG);
+            toast.show();
 
-        Intent myIntent = new Intent(this, SearchActionActivity.class);
+            DigitalLifeDevice dld = new DigitalLifeDevice();
+            dld.setDeviceID(targetAction.getDeviceGuid());
 
-        myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(myIntent);
+            dlc = DigitalLifeController.getInstance();
+            dlc.updateDevice(targetAction.getDeviceGuid(), targetAction.getLabel(), targetAction.getOperation());
+
+
+        }
+
+
     }
 
     @Override
