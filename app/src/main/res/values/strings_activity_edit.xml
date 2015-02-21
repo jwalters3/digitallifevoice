@@ -12,4 +12,11 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="action_name">Name</string>
+    <string name="label_label">Device Activity:</string>
+    <string name="guid_label">Device GUID</string>
+
+    <string-array name="on_off_array">
+        <item>On</item>
+        <item>Off</item>
+    </string-array>
 </resources>

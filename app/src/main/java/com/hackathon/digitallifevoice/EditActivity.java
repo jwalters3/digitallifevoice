@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.hackathon.digitallifevoice.data.Action;
@@ -57,8 +58,14 @@ public class EditActivity extends Activity {
     private EditText mNameView;
     private EditText mVoiceActionView;
     private EditText mDeviceView;
-    private EditText mOperationView;
+    private Spinner mOperationView;
     private View mLoginFormView;
+    private String guid;
+    private String label;
+    private TextView mdeviceLabel;
+    private TextView mdeviceGuid;
+    private Button submitBtn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +74,10 @@ public class EditActivity extends Activity {
 
         mNameView = (EditText) findViewById(R.id.action_name);
         mVoiceActionView = (EditText) findViewById(R.id.action_voice_command);
-        mOperationView = (EditText) findViewById(R.id.action_operation);
+        mOperationView = (Spinner) findViewById(R.id.action_operation_spinner);
+        mOperationView.setEnabled(false);
+        mdeviceLabel = (TextView) findViewById(R.id.label_textview);
+        mdeviceGuid = (TextView) findViewById(R.id.guid_textview);
 
         Button deviceButton = (Button) findViewById(R.id.action_device_button);
         deviceButton.setOnClickListener(new OnClickListener() {
@@ -77,8 +87,9 @@ public class EditActivity extends Activity {
             }
         });
 
-        Button addButton = (Button) findViewById(R.id.action_add_button);
-        addButton.setOnClickListener(new OnClickListener() {
+        submitBtn = (Button) findViewById(R.id.action_add_button);
+        submitBtn.setEnabled(false);
+        submitBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 saveAction();
@@ -92,7 +103,24 @@ public class EditActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == DEVICE_LIST) {
             if (resultCode == Activity.RESULT_OK) {
-                // data.
+                Bundle deviceBundle = data.getBundleExtra("guid");
+                guid = data.getStringExtra("guid");
+                label = data.getStringExtra("label");
+
+                mdeviceGuid.setText(guid);
+                mdeviceLabel.setText(label);
+                String[] operations = data.getStringArrayExtra("operations");
+
+                if (operations != null && operations.length > 0) {
+                    ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                            android.R.layout.simple_spinner_item, operations);
+                    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    mOperationView.setAdapter(dataAdapter);
+                }
+
+                mOperationView.setEnabled(true);
+                submitBtn.setEnabled(true);
+
             }
 
         }
@@ -100,11 +128,11 @@ public class EditActivity extends Activity {
 
     public void saveAction() {
         Action a = new Action();
-        a.setOperation(mOperationView.getText().toString());
+        a.setOperation(mOperationView.getSelectedItem().toString());
         a.setVoiceCommand(mVoiceActionView.getText().toString());
-        a.setLabel(mNameView.getText().toString());
+        a.setLabel(label);
         a.setDeviceType(mDeviceView.getText().toString());
-        a.setDeviceGuid("sdfsd2fsdfd");
+        a.setDeviceGuid(guid);
         DatabaseHandler db = new DatabaseHandler(this);
         db.addAction(a);
 
@@ -116,6 +144,7 @@ public class EditActivity extends Activity {
 
     void showDevicePickerActivity(){
         Intent myIntent = new Intent(this, DeviceListActivity.class);
+        myIntent.putExtra("isPicker", true);
         startActivityForResult(myIntent, this.DEVICE_LIST);
     }
 //    /**
