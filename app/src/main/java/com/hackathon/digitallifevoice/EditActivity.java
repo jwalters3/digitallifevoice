@@ -57,11 +57,12 @@ public class EditActivity extends Activity {
     // UI references.
     private EditText mNameView;
     private EditText mVoiceActionView;
-    private EditText mDeviceView;
+    private TextView mDeviceView;
     private Spinner mOperationView;
     private View mLoginFormView;
     private String guid;
     private String label;
+    private String deviceName;
     private TextView mdeviceLabel;
     private TextView mdeviceGuid;
     private Button submitBtn;
@@ -78,6 +79,7 @@ public class EditActivity extends Activity {
         mOperationView.setEnabled(false);
         mdeviceLabel = (TextView) findViewById(R.id.label_textview);
         mdeviceGuid = (TextView) findViewById(R.id.guid_textview);
+        mDeviceView = (TextView) findViewById(R.id.device_name_textview);
 
         Button deviceButton = (Button) findViewById(R.id.action_device_button);
         deviceButton.setOnClickListener(new OnClickListener() {
@@ -103,12 +105,13 @@ public class EditActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == DEVICE_LIST) {
             if (resultCode == Activity.RESULT_OK) {
-                Bundle deviceBundle = data.getBundleExtra("guid");
                 guid = data.getStringExtra("guid");
                 label = data.getStringExtra("label");
+                deviceName = data.getStringExtra("name");
 
                 mdeviceGuid.setText(guid);
                 mdeviceLabel.setText(label);
+                mDeviceView.setText(deviceName);
                 String[] operations = data.getStringArrayExtra("operations");
 
                 if (operations != null && operations.length > 0) {
@@ -131,7 +134,7 @@ public class EditActivity extends Activity {
         a.setOperation(mOperationView.getSelectedItem().toString());
         a.setVoiceCommand(mVoiceActionView.getText().toString());
         a.setLabel(label);
-        a.setDeviceType(mDeviceView.getText().toString());
+        a.setDeviceType(deviceName);
         a.setDeviceGuid(guid);
         DatabaseHandler db = new DatabaseHandler(this);
         db.addAction(a);
