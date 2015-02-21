@@ -69,6 +69,7 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
         if (isPicker) {
             // return device info to caller
             Intent mResult = new Intent();
+            mResult.putExtra("name", device.getName());
             mResult.putExtra("guid", device.getDeviceID());
             mResult.putExtra("label", device.getAction());
             mResult.putExtra("operations", device.getValues());
