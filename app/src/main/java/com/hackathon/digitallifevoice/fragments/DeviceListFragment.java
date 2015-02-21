@@ -123,13 +123,18 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
         progressDialog.dismiss();
     }
     public void onDeviceRefresh(JSONObject data) {
-        progressDialog.dismiss();
-        if (adapter != null) {
-            devices = dlc.fetchDevices();
-            adapter = new DigitalLifeDeviceAdapter(mContext, R.layout.action_item, devices);
+        if (data != null) {
+            progressDialog.dismiss();
+            if (adapter != null) {
+                devices = dlc.fetchDevices();
+                adapter = new DigitalLifeDeviceAdapter(mContext, R.layout.action_item, devices);
 
-            setListAdapter(adapter);
-            //adapter.updateItems(devices);
+                setListAdapter(adapter);
+                //adapter.updateItems(devices);
+            }
+        }
+        else {
+            onDeviceRefreshFailure("Unknown error");
         }
     }
 

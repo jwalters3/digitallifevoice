@@ -142,11 +142,12 @@ public class DigitalLifeController {
 
                 try {
                     deviceJsonData = getResource("/penguin/api/{gatewayGUID}/devices");
+                    JSONArray object = (JSONArray) ((JSONObject) deviceJsonData).get("content");
                 } catch (Exception e) {
                     e.printStackTrace();
                     errorMessage = e.toString();
                 }
-                return data;
+                return deviceJsonData;
             }
 
             @Override
@@ -155,7 +156,7 @@ public class DigitalLifeController {
 
                     callback.onDeviceRefreshFailure(errorMessage);
                 }
-                callback.onDeviceRefresh(data);
+                callback.onDeviceRefresh(deviceJsonData);
             }
         };
 
@@ -228,27 +229,31 @@ public class DigitalLifeController {
                     return;
                 }
 
-                isLoggedIn = true;
 
-                // content contains customer data
-                JSONObject content = (JSONObject)data.get("content");
+                try {
+                    // content contains customer data
+                    JSONObject content = (JSONObject) data.get("content");
+                    isLoggedIn = true;
 
-                // extract gateway guid
-                JSONArray gateways = (JSONArray) content.get("gateways");
-                JSONObject gateway = (JSONObject) gateways.get(0);  // just grabbing the first for this illustration
-                gatewayGUID = (String) gateway.get("id");
+                    // extract gateway guid
+                    JSONArray gateways = (JSONArray) content.get("gateways");
+                    JSONObject gateway = (JSONObject) gateways.get(0);  // just grabbing the first for this illustration
+                    gatewayGUID = (String) gateway.get("id");
 
-                // extract the auth token
-                authToken = (String) content.get("authToken");
+                    // extract the auth token
+                    authToken = (String) content.get("authToken");
 
-                // extract the request token
-                requestToken = (String) content.get("requestToken");
+                    // extract the request token
+                    requestToken = (String) content.get("requestToken");
 
-                System.out.println("Gateway:  " + gatewayGUID
-                        + "\nAuthToken: " + authToken + "\nRequestToken: "
-                        + requestToken);
+                    System.out.println("Gateway:  " + gatewayGUID
+                            + "\nAuthToken: " + authToken + "\nRequestToken: "
+                            + requestToken);
 
-                callback.onLogin(data);
+                    callback.onLogin(data);
+                } catch (Exception e) {
+                    callback.onLoginFailure("Error logging in");
+                }
             }
         };
 
