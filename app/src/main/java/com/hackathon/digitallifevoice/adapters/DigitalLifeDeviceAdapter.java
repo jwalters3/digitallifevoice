@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hackathon.digitallifevoice.R;
@@ -37,6 +38,12 @@ public class DigitalLifeDeviceAdapter extends ArrayAdapter<DigitalLifeDevice> {
         this.objects = objects;
     }
 
+    public void updateItems(List<DigitalLifeDevice> objects)
+    {
+        this.objects = objects;
+        this.notifyDataSetChanged();
+    }
+
     /*
      * we are overriding the getView method here - this is what defines how each
      * list item will look.
@@ -51,7 +58,7 @@ public class DigitalLifeDeviceAdapter extends ArrayAdapter<DigitalLifeDevice> {
         // to inflate it basically means to render, or show, the view.
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(R.layout.action_item, null);
+            v = inflater.inflate(R.layout.device_item, null);
         }
 
 			/*
@@ -65,9 +72,17 @@ public class DigitalLifeDeviceAdapter extends ArrayAdapter<DigitalLifeDevice> {
 
         if (i != null) {
 
-            // This is how you obtain a reference to the TextViews.
-            // These TextViews are created in the XML files we defined.
+            TextView firstLine = (TextView) v.findViewById(R.id.firstLine);
+            TextView secondLine = (TextView) v.findViewById(R.id.secondLine);
+            ImageView icon = (ImageView) v.findViewById(R.id.icon);
 
+
+            if (secondLine != null){
+                secondLine.setText(i.getName());
+            }
+            if (firstLine != null){
+                firstLine.setText(i.getStatus());
+            }
 
         }
 

@@ -23,14 +23,9 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity {
 
 
-    private List<DigitalLifeDevice> devices;
-    private DigitalLifeController dlc;
     int ADD_DEVICE =1;
-
-    public String getAppId() { return PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("appid", "OE_69B642D383971614_1"); }
-    public String getUserId() { return PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("username", "553474450");    }
-    public String getPassword() { return PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("password", "NO-PASSWD");    }
-
+    int SETTINGS = 2;
+    int DEVICE_LIST = 3;
 
 
     @Override
@@ -41,7 +36,7 @@ public class MainActivity extends ActionBarActivity {
 
 
                 ActionsListFragment fragment = (ActionsListFragment)this.getFragmentManager().findFragmentById(R.id.fragment);
-                fragment.notifyDataSetChanged();
+                fragment.addItem(a);
             }
 
         }
@@ -50,18 +45,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//
-//        dlc = DigitalLifeController.getInstance();
-//        dlc.init(getAppId(), "https://systest.digitallife.att.com");
-//        try {
-//            dlc.login( getUserId(), getPassword());
-//        } catch (Exception e) {
-//            System.out.println("Logout Failed");
-//            e.printStackTrace();
-//            return;
-//        }
-//
-//        devices = dlc.fetchDevices();
+
 
 
 
@@ -87,13 +71,18 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent myIntent = new Intent(this, SettingsActivity.class);
+            startActivityForResult(myIntent, this.SETTINGS);
+            return true;
+        }
+        if (id == R.id.action_devices) {
+            Intent myIntent = new Intent(this, DeviceListActivity.class);
+            startActivityForResult(myIntent, this.DEVICE_LIST);
             return true;
         }
         if (id == R.id.action_add) {
             Intent myIntent = new Intent(this, EditActivity.class);
-
             startActivityForResult(myIntent, this.ADD_DEVICE);
-
             return true;
         }
 
