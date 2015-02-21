@@ -1,9 +1,5 @@
 package com.hackathon.digitallifevoice.fragments;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListFragment;
@@ -20,7 +16,12 @@ import com.hackathon.digitallifevoice.adapters.ActionsAdapter;
 import com.hackathon.digitallifevoice.data.Action;
 import com.hackathon.digitallifevoice.data.DatabaseHandler;
 
-public class ActionsListFragment extends ListFragment  {
+import java.util.List;
+
+/**
+ * Created by SWBRADSH on 2/21/2015.
+ */
+public class DeviceListFragment extends ListFragment {
 
     AlertDialog.Builder deleteContact;
     ActionsAdapter adapter;
