@@ -66,13 +66,11 @@ public class EditActivity extends Activity {
 
     // UI references.
     private EditText mVoiceActionView;
-    private TextView mDeviceView;
+    private EditText mDeviceView;
     private Spinner mOperationView;
     private String guid;
     private String label;
-    private String deviceName;
-    private TextView mdeviceLabel;
-    private TextView mdeviceGuid;
+    private String deviceName;;
     private Button submitBtn;
 
 
@@ -84,11 +82,9 @@ public class EditActivity extends Activity {
         mVoiceActionView = (EditText) findViewById(R.id.action_voice_command);
         mOperationView = (Spinner) findViewById(R.id.action_operation_spinner);
         mOperationView.setEnabled(false);
-        mdeviceLabel = (TextView) findViewById(R.id.label_textview);
-        mdeviceGuid = (TextView) findViewById(R.id.guid_textview);
-        mDeviceView = (TextView) findViewById(R.id.device_name_textview);
+        mDeviceView = (EditText) findViewById(R.id.action_device);
 
-        Button deviceButton = (Button) findViewById(R.id.action_device_button);
+        ImageButton deviceButton = (ImageButton) findViewById(R.id.action_device_button);
         deviceButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,8 +142,6 @@ public class EditActivity extends Activity {
                     label = data.getStringExtra("label");
                     deviceName = data.getStringExtra("name");
 
-                    mdeviceGuid.setText(guid);
-                    mdeviceLabel.setText(label);
                     mDeviceView.setText(deviceName);
                     String[] operations = data.getStringArrayExtra("operations");
 
