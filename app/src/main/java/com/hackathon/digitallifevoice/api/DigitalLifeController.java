@@ -40,6 +40,17 @@ import android.os.AsyncTask;
  */
 public class DigitalLifeController {
 
+
+    public interface OnLoginListener {
+        public void onLogin(JSONObject data );
+        public void onLoginFailure(String message);
+    }
+
+    public interface OnDeviceRefresh {
+        public void refresh(JSONObject data );
+        public void onDeviceRefreshFailure(String message);
+    }
+
     private static DigitalLifeController me;
 
     private String penguinAppId;
@@ -59,6 +70,22 @@ public class DigitalLifeController {
     public boolean isLoggedIn = false;
 
     private final JSONParser jsonParser = new JSONParser();
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public String getRequestToken() {
+        return requestToken;
+    }
+
+    public void setRequestToken(String requestToken) {
+        this.requestToken = requestToken;
+    }
 
     public static synchronized DigitalLifeController getInstance() {
         if(me == null) {
@@ -86,8 +113,39 @@ public class DigitalLifeController {
         httpclient = new DefaultHttpClient();
     }
 
-    public void login(final String userName, final String password)
+
+    public void getDevices(OnDeviceRefresh onDeviceListen) {
+
+        final OnDeviceRefresh callback = onDeviceListen;
+
+        AsyncTask<JSONObject, Void, JSONObject> task = new AsyncTask<JSONObject, Void, JSONObject>() {
+
+            @Override
+            protected JSONObject doInBackground(JSONObject... params) {
+                System.out.println("starting task in background");
+                JSONObject data = null;
+
+                try {
+                    deviceJsonData = getResource("/penguin/api/{gatewayGUID}/devices");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.onDeviceRefreshFailure((e.toString()));
+                }
+                callback.refresh(data);
+                return data;
+            }
+        };
+
+        task.execute();
+
+    }
+
+
+
+
+    public void login(final String userName, final String password, OnLoginListener onLogin)
             throws Exception {
+        final OnLoginListener callback = onLogin;
 
         AsyncTask<JSONObject, Void, JSONObject> task = new AsyncTask<JSONObject, Void, JSONObject>() {
 
@@ -121,15 +179,17 @@ public class DigitalLifeController {
                             + requestToken);
 
                 } catch (Exception e) {
+
                     e.printStackTrace();
+                    callback.onLoginFailure((e.toString()));
                 }
 
-                try {
-                    deviceJsonData = getResource("/penguin/api/{gatewayGUID}/devices");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+//                try {
+//                    deviceJsonData = getResource("/penguin/api/{gatewayGUID}/devices");
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+                callback.onLogin(data);
                 return data;
             }
 
@@ -163,7 +223,7 @@ public class DigitalLifeController {
         };
 
         task.execute();
-        task.get(5000, TimeUnit.MILLISECONDS);
+        //task.get(5000, TimeUnit.MILLISECONDS);
 
     }
 

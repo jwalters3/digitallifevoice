@@ -33,7 +33,8 @@ public class ActionsListFragment extends ListFragment  {
         deleteItemPrompt(action);
     }
 
-    public void notifyDataSetChanged() {
+    public void addItem(Action a) {
+        adapter.add(a);
         adapter.notifyDataSetChanged();
     }
 
