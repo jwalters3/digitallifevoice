@@ -316,7 +316,7 @@ public class DigitalLifeController {
                     System.out.println(returnValue);
                 } catch (Exception exp) {
                     System.out.println(exp.getCause() + " " + exp.getMessage());
-                    throw new RuntimeException(exp);
+                    //throw new RuntimeException(exp);
                 }
             }
         };

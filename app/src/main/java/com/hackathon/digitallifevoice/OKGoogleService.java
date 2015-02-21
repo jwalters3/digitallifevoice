@@ -3,6 +3,7 @@ package com.hackathon.digitallifevoice;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.EditText;
@@ -25,6 +26,13 @@ public class OKGoogleService extends AccessibilityService {
     private String sSearchString = null;
     private boolean bFoundSearch = false;
     private DigitalLifeController dlc;
+
+    public String getAppId() { return PreferenceManager.getDefaultSharedPreferences(this).getString("appid", "OE_69B642D383971614_1"); }
+
+    public String getAuthToken() { return PreferenceManager.getDefaultSharedPreferences(this).getString("authtoken", "");    }
+    public String getRequestToken() { return PreferenceManager.getDefaultSharedPreferences(this).getString("requesttoken", "");    }
+    public String getGatewayGuid() { return PreferenceManager.getDefaultSharedPreferences(this).getString("gatewayguid", "");    }
+
 
     private String getEventType(AccessibilityEvent event) {
         switch (event.getEventType()) {
@@ -75,9 +83,14 @@ public class OKGoogleService extends AccessibilityService {
             toast.show();
 
             DigitalLifeDevice dld = new DigitalLifeDevice();
+
             dld.setDeviceID(targetAction.getDeviceGuid());
 
             dlc = DigitalLifeController.getInstance();
+            dlc.init(getAppId(), "https://systest.digitallife.att.com");
+            dlc.setGatewayGUID(this.getGatewayGuid());
+            dlc.setAuthToken(this.getAuthToken());
+            dlc.setRequestToken(this.getRequestToken());
             dlc.updateDevice(targetAction.getDeviceGuid(), targetAction.getLabel(), targetAction.getOperation());
 
 
@@ -95,12 +108,12 @@ public class OKGoogleService extends AccessibilityService {
                     this.sSearchString = getEventText(event);
                 }
             }
-            if (event.getClassName().toString().contains("com.android.org.chromium")) {
+           // if (event.getClassName().toString().contains("com.android.org.chromium")) {
                 if (bFoundSearch) {
                     bFoundSearch = false;
                     processSearch(this.sSearchString);
                 }
-            }
+          //  }
 
 
             Log.v(TAG, String.format(

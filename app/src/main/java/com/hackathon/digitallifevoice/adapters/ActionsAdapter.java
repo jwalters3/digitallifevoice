@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hackathon.digitallifevoice.R;
@@ -69,14 +70,24 @@ public class ActionsAdapter  extends ArrayAdapter<Action> {
             // These TextViews are created in the XML files we defined.
 
             TextView voiceaction = (TextView) v.findViewById(R.id.voiceaction);
-            TextView deviceId = (TextView) v.findViewById(R.id.deviceId);
+            TextView deviceId = (TextView) v.findViewById(R.id.deviceName);
+            ImageView icon = (ImageView) v.findViewById(R.id.icon);
 
 
             if (voiceaction != null){
-                voiceaction.setText(i.getVoiceCommand());
+                voiceaction.setText("\"" + i.getVoiceCommand()+ "\"");
             }
             if (deviceId != null){
-                deviceId.setText(i.getDeviceType());
+                deviceId.setText(i.getDeviceType() + " - " + i.getOperation());
+            }
+
+            if (icon != null){
+                if (i.getDeviceType().equals("Door Lock")) {
+                    icon.setImageResource(R.drawable.device_list_icon_lock);
+                }
+                if (i.getDeviceType().equals("Power Switch")) {
+                    icon.setImageResource(R.drawable.device_list_icon_plug);
+                }
             }
 
         }
