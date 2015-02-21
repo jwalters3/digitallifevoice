@@ -13,8 +13,8 @@ public class DigitalLifeViewConfiguration {
         viewableDeviceList.add("smart-plug");
         viewableDeviceList.add("door-lock");
 
-        viewableDeviceList.add("camera");
-        viewableDeviceList.add("digital-life-controller");
+        //viewableDeviceList.add("camera");
+        //viewableDeviceList.add("digital-life-controller");
 //
 //        editableDeviceList.add("smart-plug");
 //        editableDeviceList.add("door-lock");

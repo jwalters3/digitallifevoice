@@ -73,9 +73,9 @@ public class ActionsListFragment extends ListFragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         DatabaseHandler db = new DatabaseHandler(inflater.getContext());
-        List<Action> contacts = db.getAllActions();
+        List<Action> actions = db.getAllActions();
 
-        adapter = new ActionsAdapter(inflater.getContext(), R.layout.action_item, contacts);
+        adapter = new ActionsAdapter(inflater.getContext(), R.layout.action_item, actions);
 
         setListAdapter(adapter);
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_actions_list, null);
