@@ -2,6 +2,7 @@ package com.hackathon.digitallifevoice;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -15,6 +16,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 
 
@@ -39,8 +41,23 @@ public class SettingsActivity extends PreferenceActivity {
      * shown on tablets.
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
+    public void saveTokens(String authToken, String requestToken, String gatewayGuid) {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        //.getPreferences().edit();
+        editor.putString("authtoken", authToken);
+        editor.putString("requesttoken", requestToken);
+        editor.putString("gatewayguid", gatewayGuid);
+        editor.apply();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        saveTokens("","","");
 
 
+
+    }
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
