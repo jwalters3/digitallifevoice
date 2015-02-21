@@ -38,14 +38,7 @@ public class MainActivity extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ADD_DEVICE) {
             if (resultCode == Activity.RESULT_OK) {
-                Action a = new Action();
-                a.setOperation("on");
-                a.setVoiceCommand("Turn on Front light");
-                a.setLabel("switch");
-                a.setDeviceType("light");
-                a.setDeviceGuid("sdfsd2fsdfd");
-                DatabaseHandler db = new DatabaseHandler(this);
-                db.addAction(a);
+
 
                 ActionsListFragment fragment = (ActionsListFragment)this.getFragmentManager().findFragmentById(R.id.fragment);
                 fragment.notifyDataSetChanged();
