@@ -88,6 +88,9 @@ public class ActionsAdapter  extends ArrayAdapter<Action> {
                 if (i.getDeviceType().equals("Power Switch")) {
                     icon.setImageResource(R.drawable.device_list_icon_plug);
                 }
+                if (i.getDeviceType().equals("Smart Plug")) {
+                    icon.setImageResource(R.drawable.device_list_icon_plug);
+                }
             }
 
         }
