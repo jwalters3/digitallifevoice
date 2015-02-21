@@ -4,9 +4,12 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -16,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.speech.RecognizerIntent;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -25,14 +29,17 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hackathon.digitallifevoice.data.Action;
 import com.hackathon.digitallifevoice.data.DatabaseHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -40,7 +47,10 @@ import java.util.List;
  */
 public class EditActivity extends Activity {
 
-    int DEVICE_LIST = 3;
+    private final int ADD_DEVICE =1;
+    private final int SETTINGS = 2;
+    private final int DEVICE_LIST = 3;
+    private final int REQ_CODE_SPEECH_INPUT = 4;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -55,11 +65,9 @@ public class EditActivity extends Activity {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private EditText mNameView;
     private EditText mVoiceActionView;
     private TextView mDeviceView;
     private Spinner mOperationView;
-    private View mLoginFormView;
     private String guid;
     private String label;
     private String deviceName;
@@ -73,7 +81,6 @@ public class EditActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
-        mNameView = (EditText) findViewById(R.id.action_name);
         mVoiceActionView = (EditText) findViewById(R.id.action_voice_command);
         mOperationView = (Spinner) findViewById(R.id.action_operation_spinner);
         mOperationView.setEnabled(false);
@@ -89,6 +96,15 @@ public class EditActivity extends Activity {
             }
         });
 
+        ImageButton voiceButton = (ImageButton) findViewById(R.id.search_voice_btn);
+        voiceButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                promptSpeechInput();
+            }
+        });
+
+
         submitBtn = (Button) findViewById(R.id.action_add_button);
         submitBtn.setEnabled(false);
         submitBtn.setOnClickListener(new OnClickListener() {
@@ -103,29 +119,69 @@ public class EditActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == DEVICE_LIST) {
-            if (resultCode == Activity.RESULT_OK) {
-                guid = data.getStringExtra("guid");
-                label = data.getStringExtra("label");
-                deviceName = data.getStringExtra("name");
 
-                mdeviceGuid.setText(guid);
-                mdeviceLabel.setText(label);
-                mDeviceView.setText(deviceName);
-                String[] operations = data.getStringArrayExtra("operations");
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == RESULT_OK && null != data) {
 
-                if (operations != null && operations.length > 0) {
-                    ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                            android.R.layout.simple_spinner_item, operations);
-                    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    mOperationView.setAdapter(dataAdapter);
+                    //CharSequence[] results = data.getCharSequenceArrayExtra(RecognizerIntent.EXTRA_RESULTS);
+                    ArrayList<String> speechResult = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    final CharSequence[] results = speechResult.toArray(new CharSequence[speechResult.size()]);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Select");
+                    builder.setItems(results, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // the user clicked on colors[which]
+                            mVoiceActionView.setText(results[which]);
+                        }
+                    });
+                    builder.show();
                 }
-
-                mOperationView.setEnabled(true);
-                submitBtn.setEnabled(true);
-
+                break;
             }
+            case DEVICE_LIST: {
+                if (resultCode == RESULT_OK && null != data) {
+                    guid = data.getStringExtra("guid");
+                    label = data.getStringExtra("label");
+                    deviceName = data.getStringExtra("name");
 
+                    mdeviceGuid.setText(guid);
+                    mdeviceLabel.setText(label);
+                    mDeviceView.setText(deviceName);
+                    String[] operations = data.getStringArrayExtra("operations");
+
+                    if (operations != null && operations.length > 0) {
+                        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                                android.R.layout.simple_spinner_item, operations);
+                        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        mOperationView.setAdapter(dataAdapter);
+                    }
+
+                    mOperationView.setEnabled(true);
+                    submitBtn.setEnabled(true);
+                }
+            }
+        }
+
+    }
+    /**
+     * Showing google speech input dialog
+     * */
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                getString(R.string.speech_prompt));
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.speech_not_supported),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
