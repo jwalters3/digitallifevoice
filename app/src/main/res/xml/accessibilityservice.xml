@@ -3,4 +3,5 @@
     android:accessibilityEventTypes="typeViewFocused"
     android:accessibilityFeedbackType="feedbackAllMask"
     android:canRetrieveWindowContent="true"
+    android:description="@string/service_description"
     android:notificationTimeout="100" />

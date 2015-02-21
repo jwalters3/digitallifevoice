@@ -14,5 +14,6 @@
     <string name="action_voicetest">Recognize</string>
     <string name="speech_not_supported">Speech is unsupported on your device</string>
     <string name="speech_prompt">Say command</string>
+    <string name="service_description"><![CDATA[This service allows AT&T Digital Voice application to integrate with Google Search (\"OK Google\")]]></string>
 
 </resources>
