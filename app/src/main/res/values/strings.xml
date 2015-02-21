@@ -11,5 +11,8 @@
     <string name="username">User Name</string>
     <string name="password">Password</string>
     <string name="action_devices">Show Devices</string>
+    <string name="action_voicetest">Recognize</string>
+    <string name="speech_not_supported">Speech is unsupported on your device</string>
+    <string name="speech_prompt">Say command</string>
 
 </resources>
