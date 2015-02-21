@@ -46,9 +46,14 @@ public class DigitalLifeController {
         public void onLoginFailure(String message);
     }
 
-    public interface OnDeviceRefresh {
-        public void refresh(JSONObject data );
+    public interface OnDeviceRefreshListener {
+        public void onDeviceRefresh(JSONObject data );
         public void onDeviceRefreshFailure(String message);
+    }
+
+    public interface OnDeviceChangeListener {
+        public void onDeviceChangeSuccess(JSONObject data );
+        public void onDeviceChangeFailure(String message);
     }
 
     private static DigitalLifeController me;
@@ -114,12 +119,12 @@ public class DigitalLifeController {
     }
 
 
-    public void getDevices(OnDeviceRefresh onDeviceListen) {
+    public void getDevices(OnDeviceRefreshListener onDeviceListen) {
 
-        final OnDeviceRefresh callback = onDeviceListen;
+        final OnDeviceRefreshListener callback = onDeviceListen;
 
         AsyncTask<JSONObject, Void, JSONObject> task = new AsyncTask<JSONObject, Void, JSONObject>() {
-
+            String errorMessage =  null;
             @Override
             protected JSONObject doInBackground(JSONObject... params) {
                 System.out.println("starting task in background");
@@ -129,10 +134,18 @@ public class DigitalLifeController {
                     deviceJsonData = getResource("/penguin/api/{gatewayGUID}/devices");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    callback.onDeviceRefreshFailure((e.toString()));
+                    errorMessage = e.toString();
                 }
-                callback.refresh(data);
                 return data;
+            }
+
+            @Override
+            protected void onPostExecute(JSONObject data) {
+                if (errorMessage != null) {
+
+                    callback.onDeviceRefreshFailure(errorMessage);
+                }
+                callback.onDeviceRefresh(data);
             }
         };
 
@@ -149,6 +162,7 @@ public class DigitalLifeController {
 
         AsyncTask<JSONObject, Void, JSONObject> task = new AsyncTask<JSONObject, Void, JSONObject>() {
 
+            String errorMessage = null;
             @Override
             protected JSONObject doInBackground(JSONObject... params) {
                 System.out.println("starting task in background");
@@ -181,7 +195,7 @@ public class DigitalLifeController {
                 } catch (Exception e) {
 
                     e.printStackTrace();
-                    callback.onLoginFailure((e.toString()));
+                    errorMessage = e.toString();
                 }
 
 //                try {
@@ -189,12 +203,16 @@ public class DigitalLifeController {
 //                } catch (Exception e) {
 //                    e.printStackTrace();
 //                }
-                callback.onLogin(data);
+
                 return data;
             }
 
             @Override
             protected void onPostExecute(JSONObject data) {
+                if (errorMessage != null) {
+
+                    callback.onLoginFailure(errorMessage);
+                }
                 if (data == null) {
                     isLoggedIn = false;
                     return;
@@ -219,6 +237,8 @@ public class DigitalLifeController {
                 System.out.println("Gateway:  " + gatewayGUID
                         + "\nAuthToken: " + authToken + "\nRequestToken: "
                         + requestToken);
+
+                callback.onLogin(data);
             }
         };
 
@@ -364,35 +384,21 @@ public class DigitalLifeController {
     public static void decorateDevice( DigitalLifeDevice device) {
 
         String deviceType = device.getDeviceType();
-//
-//        if("door-lock".equalsIgnoreCase(deviceType)) {
-//            if("unlocked".equalsIgnoreCase( device.getStatus())) {
-//                device.setResourceID( R.drawable.device_list_icon_lock_inactive);
-//            } else {
-//                device.setResourceID( R.drawable.device_list_icon_lock_active);
-//            }
-//        } else
-//        if("smart-plug".equalsIgnoreCase(deviceType)) {
-//            if("off".equalsIgnoreCase( device.getStatus())) {
-//                device.setResourceID( R.drawable.device_list_icon_power_inactive);
-//            } else {
-//                device.setResourceID( R.drawable.device_list_icon_power_active);
-//            }
-//        } else
-//        if("contact-sensor".equalsIgnoreCase(deviceType)) {
-//            if("closed".equalsIgnoreCase( device.getStatus())) {
-//                device.setResourceID( R.drawable.device_list_icon_sensor_inactive);
-//            } else {
-//                device.setResourceID( R.drawable.device_list_icon_sensor_active);
-//            }
-//        } else
-//        if("water-sensor".equalsIgnoreCase(deviceType)) {
-//            if("closed".equalsIgnoreCase( device.getStatus())) {
-//                device.setResourceID( R.drawable.device_list_icon_water_temp_inactive);
-//            } else {
-//                device.setResourceID( R.drawable.device_list_icon_water_temp_active);
-//            }
-//        }
+
+        if("door-lock".equalsIgnoreCase(deviceType)) {
+            if("unlocked".equalsIgnoreCase( device.getStatus())) {
+                device.setResourceID( R.drawable.device_list_icon_lock);
+            } else {
+                device.setResourceID( R.drawable.device_list_icon_lock);
+            }
+        } else
+        if("smart-plug".equalsIgnoreCase(deviceType)) {
+            if("off".equalsIgnoreCase( device.getStatus())) {
+                device.setResourceID( R.drawable.device_list_icon_plug);
+            } else {
+                device.setResourceID( R.drawable.device_list_icon_plug);
+            }
+        }
     }
 
     public List<DigitalLifeDevice> fetchDevices() {

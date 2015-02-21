@@ -83,6 +83,9 @@ public class DigitalLifeDeviceAdapter extends ArrayAdapter<DigitalLifeDevice> {
             if (firstLine != null){
                 firstLine.setText(i.getStatus());
             }
+            if (i.getResourceID() > 0) {
+                icon.setImageResource(i.getResourceID());
+            }
 
         }
 
