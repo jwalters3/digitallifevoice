@@ -6,14 +6,48 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.hackathon.digitallifevoice.api.DigitalLifeController;
+import com.hackathon.digitallifevoice.api.DigitalLifeDevice;
+import com.hackathon.digitallifevoice.data.Action;
+import com.hackathon.digitallifevoice.data.DatabaseHandler;
+
+import java.util.List;
+
 /**
  * A list view that shows the current list of paired actions
  */
 public class MainActivity extends ActionBarActivity {
 
+
+    private List<DigitalLifeDevice> devices;
+    private DigitalLifeController dlc;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        dlc = DigitalLifeController.getInstance();
+        dlc.init("OE_69B642D383971614_1", "https://systest.digitallife.att.com");
+        try {
+            dlc.login( "553474450", "NO-PASSWD");
+        } catch (Exception e) {
+            System.out.println("Logout Failed");
+            e.printStackTrace();
+            return;
+        }
+
+        devices = dlc.fetchDevices();
+        Action a = new Action();
+        DigitalLifeDevice d = devices.get(0);
+        a.setOperation("on");
+        a.setVoiceCommand("Turn on Front light");
+        a.setLabel("switch");
+        a.setDeviceType("light");
+        a.setDeviceGuid("sdfsd2fsdfd");
+        DatabaseHandler db = new DatabaseHandler(this);
+        //db.addAction(a);
+
+
         setContentView(R.layout.activity_main);
     }
 
