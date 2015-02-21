@@ -2,8 +2,11 @@ package com.hackathon.digitallifevoice;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.content.Intent;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.EditText;
+import android.widget.Toast;
 
 /**
  * Created by SWBRADSH on 2/20/2015.
@@ -11,6 +14,9 @@ import android.view.accessibility.AccessibilityEvent;
 public class OKGoogleService extends AccessibilityService {
 
     static final String TAG = "OKGoogleService";
+
+    private String sSearchString = null;
+    private boolean bFoundSearch = false;
 
     private String getEventType(AccessibilityEvent event) {
         switch (event.getEventType()) {
@@ -40,12 +46,40 @@ public class OKGoogleService extends AccessibilityService {
         return sb.toString();
     }
 
+    private void processSearch(String searchText) {
+
+        String toastText = "Process this search text: " + searchText;
+        Toast toast = Toast.makeText(this, toastText, Toast.LENGTH_LONG);
+        toast.show();
+
+        Intent myIntent = new Intent(this, MainActivity.class);
+
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(myIntent);
+    }
+
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        Log.v(TAG, String.format(
-                "onAccessibilityEvent: [type] %s [class] %s [package] %s [time] %s [text] %s",
-                getEventType(event), event.getClassName(), event.getPackageName(),
-                event.getEventTime(), getEventText(event)));
+        if (event.getPackageName().equals("com.google.android.googlequicksearchbox")) {
+            if (event.getClassName().equals("android.widget.EditText")) {
+                if (event.getText().size() > 0) {
+                    bFoundSearch = true;
+                    this.sSearchString = getEventText(event);
+                }
+            }
+            if (event.getClassName().toString().contains("com.android.org.chromium")) {
+                if (bFoundSearch) {
+                    bFoundSearch = false;
+                    processSearch(this.sSearchString);
+                }
+            }
+
+
+            Log.v(TAG, String.format(
+                    "onAccessibilityEvent: [type] %s [class] %s [package] %s [time] %s [text] %s",
+                    getEventType(event), event.getClassName(), event.getPackageName(),
+                    event.getEventTime(), getEventText(event)));
+        }
     }
 
     @Override
