@@ -25,6 +25,7 @@ public class OKGoogleService extends AccessibilityService {
 
     private String sSearchString = null;
     private boolean bFoundSearch = false;
+    private boolean bSentEvent = false;
     private DigitalLifeController dlc;
 
     public String getAppId() { return PreferenceManager.getDefaultSharedPreferences(this).getString("appid", "OE_69B642D383971614_1"); }
@@ -79,7 +80,7 @@ public class OKGoogleService extends AccessibilityService {
         Action targetAction = getActionForVoiceText(searchText);
         if (targetAction != null) {
             String toastText = "AT&T Digital Life Action received";
-            Toast toast = Toast.makeText(this, toastText, Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, toastText, Toast.LENGTH_SHORT);
             toast.show();
 
             DigitalLifeDevice dld = new DigitalLifeDevice();
@@ -93,9 +94,8 @@ public class OKGoogleService extends AccessibilityService {
             dlc.setRequestToken(this.getRequestToken());
             dlc.updateDevice(targetAction.getDeviceGuid(), targetAction.getLabel(), targetAction.getOperation());
 
-
         }
-
+        bSentEvent = false;
 
     }
 
@@ -103,7 +103,7 @@ public class OKGoogleService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getPackageName().equals("com.google.android.googlequicksearchbox")) {
             if (event.getClassName().equals("android.widget.EditText")) {
-                if (event.getText().size() > 0) {
+                if ((!bSentEvent) && (event.getText().size() > 0)) {
                     bFoundSearch = true;
                     this.sSearchString = getEventText(event);
                 }
@@ -111,6 +111,7 @@ public class OKGoogleService extends AccessibilityService {
            // if (event.getClassName().toString().contains("com.android.org.chromium")) {
                 if (bFoundSearch) {
                     bFoundSearch = false;
+                    bSentEvent = true;
                     processSearch(this.sSearchString);
                 }
           //  }
