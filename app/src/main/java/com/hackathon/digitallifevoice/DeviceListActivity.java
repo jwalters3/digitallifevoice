@@ -4,14 +4,23 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.hackathon.digitallifevoice.fragments.DeviceListFragment;
 
 // This shows a list of devices and their current status
-public class DeviceListActivity extends ActionBarActivity {
+public class DeviceListActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_list);
+
+        Bundle bundle = this.getIntent().getExtras();
+        if (bundle != null) {
+            boolean isPicker = bundle.getBoolean("isPicker");
+            DeviceListFragment fragment = (DeviceListFragment)this.getFragmentManager().findFragmentById(R.id.fragment);
+            fragment.setIsPicker(isPicker);
+        }
+
     }
 
 

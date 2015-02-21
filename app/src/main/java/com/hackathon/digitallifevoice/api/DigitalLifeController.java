@@ -1,5 +1,7 @@
 package com.hackathon.digitallifevoice.api;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.hackathon.digitallifevoice.R;
@@ -130,9 +132,9 @@ public class DigitalLifeController {
     public void getDevices(OnDeviceRefreshListener onDeviceListen) {
 
         final OnDeviceRefreshListener callback = onDeviceListen;
-
         AsyncTask<JSONObject, Void, JSONObject> task = new AsyncTask<JSONObject, Void, JSONObject>() {
             String errorMessage =  null;
+
             @Override
             protected JSONObject doInBackground(JSONObject... params) {
                 System.out.println("starting task in background");

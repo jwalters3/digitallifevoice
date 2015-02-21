@@ -3,13 +3,13 @@ package com.hackathon.digitallifevoice.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +17,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.hackathon.digitallifevoice.R;
-import com.hackathon.digitallifevoice.adapters.ActionsAdapter;
 import com.hackathon.digitallifevoice.adapters.DigitalLifeDeviceAdapter;
 import com.hackathon.digitallifevoice.api.DigitalLifeController;
 import com.hackathon.digitallifevoice.api.DigitalLifeDevice;
-import com.hackathon.digitallifevoice.data.Action;
-import com.hackathon.digitallifevoice.data.DatabaseHandler;
 
 import org.json.simple.JSONObject;
 
@@ -36,7 +33,7 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
 
     AlertDialog.Builder deleteContact;
     DigitalLifeDeviceAdapter adapter;
-
+    private ProgressDialog progressDialog ;
 
     private List<DigitalLifeDevice> devices = new ArrayList<DigitalLifeDevice>();
     private DigitalLifeController dlc;
@@ -59,15 +56,29 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
         editor.apply();
     }
     Context mContext;
+
+    public void setIsPicker(boolean isPicker) {
+        this.isPicker = isPicker;
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
+        DigitalLifeDevice device = adapter.getItem(position);
+
         if (isPicker) {
             // return device info to caller
+            Intent mResult = new Intent();
+            mResult.putExtra("guid", device.getDeviceID());
+            mResult.putExtra("label", device.getAction());
+            mResult.putExtra("operations", device.getValues());
+
+            getActivity().setResult(Activity.RESULT_OK, mResult);
+            getActivity().finish();
         } else
         {
             // Toggle device
-            DigitalLifeDevice device = adapter.getItem(position);
+
             // retrieve the potential values this device can be set to.  ON/OFF, LOCKED/UNLOCKED, etc...
             String[] potentialValues = device.getValues();
             String pendingValue = null;
@@ -93,6 +104,7 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
     public void onLoginFailure(String message) {
         Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_LONG);
         toast.show();
+        progressDialog.dismiss();
     }
 
     public void onLogin(JSONObject data) {
@@ -106,9 +118,11 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
         Toast toast = Toast.makeText(getActivity(), "Failed to refresh devices:"+ message, Toast.LENGTH_LONG);
         toast.show();
         // clear out tokens
-        this.saveTokens("","","");
+        this.saveTokens("", "", "");
+        progressDialog.dismiss();
     }
     public void onDeviceRefresh(JSONObject data) {
+        progressDialog.dismiss();
         if (adapter != null) {
             devices = dlc.fetchDevices();
             adapter = new DigitalLifeDeviceAdapter(mContext, R.layout.action_item, devices);
@@ -153,6 +167,13 @@ public class DeviceListFragment extends ListFragment implements DigitalLifeContr
 
         setListAdapter(adapter);
         loginDigitalLife();
+
+        progressDialog = new ProgressDialog ( this.getActivity() ) ;
+        progressDialog.setCancelable ( false ) ;
+        progressDialog.setMessage ( "Retrieving devices..." ) ;
+        progressDialog.setTitle ( "Please wait" ) ;
+        progressDialog.setIndeterminate ( true ) ;
+        progressDialog.show();
 
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_device_list, null);
         return root;
